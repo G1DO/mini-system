@@ -104,17 +104,30 @@ The database is intentionally simple.
 - No SQL
 - No JSON (initially)
 
-### Public API (Example)
+### Public API
 
 ```rust
-pub struct Db;
-
-impl Db {
-    pub fn open(path: &str) -> Result<Db, DbError>;
-    pub fn insert(&mut self, key: u32, value: String) -> Result<(), DbError>;
-    pub fn get(&self, key: u32) -> Option<String>;
+pub struct Db {
+    path: String,
 }
 
+impl Db {
+    pub fn open(path: &str) -> Db;
+    pub fn insert(&self, key: u32, value: &str);
+    pub fn get(&self, key: u32) -> Option<String>;
+    pub fn get_all(&self) -> Vec<(u32, String)>;
+    pub fn update(&self, key: u32, value: &str);
+    pub fn delete(&self, key: u32);
+}
+```
+
+### Storage Format
+
+Simple text file with one record per line:
+```
+1:Alice
+2:Bob
+3:Carol
 ```
 
 ### Rules
@@ -136,13 +149,15 @@ impl Db {
 - Call database functions
 - Send valid HTTP responses
 
-### Supported Endpoints (Example)
+### Supported Endpoints
 
 ```
-GET /health
-GET /get?key=1
-GET /set?key=1&value=hello
-
+GET /              → Welcome message
+GET /all           → List all data
+GET /get?key=1     → Get value by key
+GET /set?key=1&value=hello    → Insert new record
+GET /update?key=1&value=world → Update existing record
+GET /delete?key=1  → Delete record
 ```
 
 ### HTTP Scope
@@ -167,11 +182,14 @@ The client is a **testing tool**, not an application.
 - Send HTTP request
 - Print server response
 
-Example usage:
+### Usage
 
-```
-client GET /get?key=1
-
+```bash
+cargo run -p client -- all              # List all data
+cargo run -p client -- get 1            # Get value for key 1
+cargo run -p client -- set 1 Alice      # Insert key=1, value=Alice
+cargo run -p client -- update 1 Alicia  # Update key 1
+cargo run -p client -- delete 1         # Delete key 1
 ```
 
 This helps understand:

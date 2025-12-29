@@ -1,6 +1,8 @@
-[package]
-name = "mini-system"
-version = "0.1.0"
-edition = "2024"
+[workspace]
+resolver = "2"
 
-[dependencies]
+members = [
+    "crates/minidb",
+    "crates/server",
+    "crates/client",
+]

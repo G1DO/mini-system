@@ -76,7 +76,24 @@ impl Db {
             .expect("Failed to write updated database");
     }
 
-    // TODO: delete
+    // Get all key-value pairs
+    pub fn get_all(&self) -> Vec<(u32, String)> {
+        let mut results = Vec::new();
+
+        let content = std::fs::read_to_string(&self.path).unwrap_or_default();
+
+        for line in content.lines() {
+            let parts: Vec<&str> = line.splitn(2, ':').collect();
+            if parts.len() == 2 {
+                if let Ok(key) = parts[0].parse::<u32>() {
+                    results.push((key, parts[1].to_string()));
+                }
+            }
+        }
+
+        results
+    }
+
     pub fn delete(&self, key: u32) {
         // Step 1: Read entire file
         let content = std::fs::read_to_string(&self.path)
